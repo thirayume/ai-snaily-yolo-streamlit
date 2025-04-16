@@ -1,36 +1,35 @@
 import streamlit as st
+
+# Set page config FIRST
+st.set_page_config(
+    page_title="AI Snaily - YOLO Detection",
+    page_icon="👁️",
+    layout="wide"
+)
+
 import os
 import time
 import sys
-
-# Set page config - MUST be the first Streamlit command
-st.set_page_config(
-    page_title="AI Snaily - YOLO Detection",
-    page_icon="👁️",
-    layout="wide"
-)
-
-# Now you can add the debug info and other Streamlit commands
-try:
-    import cv2
-    st.write(f"Python version: {sys.version}")
-    st.write(f"OpenCV version: {cv2.__version__}")
-except Exception as e:
-    st.error(f"OpenCV import error: {str(e)}")
-    st.write(f"Python version: {sys.version}")
-    
+import numpy as np
 from PIL import Image
 import io
 import base64
-import numpy as np
-from utils.detection import process_image, get_model
 
-# Set page config
-st.set_page_config(
-    page_title="AI Snaily - YOLO Detection",
-    page_icon="👁️",
-    layout="wide"
-)
+# Try importing utils after other imports
+try:
+    from utils.detection import process_image, get_model
+    st.success("Successfully imported detection modules")
+except Exception as e:
+    st.error(f"Error importing detection modules: {str(e)}")
+    st.info("The app may not function properly. Please check logs for details.")
+
+# Debug info
+st.write(f"Python version: {sys.version}")
+try:
+    import cv2
+    st.write(f"OpenCV version: {cv2.__version__}")
+except Exception as e:
+    st.error(f"OpenCV import error: {str(e)}")
 
 # Custom CSS for styling
 st.markdown("""

@@ -1,9 +1,16 @@
 import streamlit as st
 import os
 import time
-import sys  # Added sys import first
+import sys
 
-# Add cv2 import before using it
+# Set page config - MUST be the first Streamlit command
+st.set_page_config(
+    page_title="AI Snaily - YOLO Detection",
+    page_icon="👁️",
+    layout="wide"
+)
+
+# Now you can add the debug info and other Streamlit commands
 try:
     import cv2
     st.write(f"Python version: {sys.version}")
@@ -15,7 +22,7 @@ except Exception as e:
 from PIL import Image
 import io
 import base64
-import numpy as np  # Added numpy import
+import numpy as np
 from utils.detection import process_image, get_model
 
 # Set page config

@@ -1,35 +1,17 @@
 import streamlit as st
+import os
+import time
+from PIL import Image
+import io
+import base64
+from utils.detection import process_image, get_model
 
-# Set page config FIRST
+# Set page config
 st.set_page_config(
     page_title="AI Snaily - YOLO Detection",
     page_icon="👁️",
     layout="wide"
 )
-
-import os
-import time
-import sys
-import numpy as np
-from PIL import Image
-import io
-import base64
-
-# Try importing utils after other imports
-try:
-    from utils.detection import process_image, get_model
-    st.success("Successfully imported detection modules")
-except Exception as e:
-    st.error(f"Error importing detection modules: {str(e)}")
-    st.info("The app may not function properly. Please check logs for details.")
-
-# Debug info
-st.write(f"Python version: {sys.version}")
-try:
-    import cv2
-    st.write(f"OpenCV version: {cv2.__version__}")
-except Exception as e:
-    st.error(f"OpenCV import error: {str(e)}")
 
 # Custom CSS for styling
 st.markdown("""
@@ -103,9 +85,9 @@ with col2:
     # Model selection checkboxes
     st.markdown('<div class="model-selection">', unsafe_allow_html=True)
     yolov5 = st.checkbox("YOLOv5", value=True)
-    yolov8 = st.checkbox("YOLOv8", value=False)  # Changed default to False to avoid OpenCV errors
-    yolov10 = st.checkbox("YOLOv10", value=False)  # Changed default to False
-    yolov11 = st.checkbox("YOLOv11", value=False)  # Changed default to False
+    yolov8 = st.checkbox("YOLOv8", value=True)
+    yolov10 = st.checkbox("YOLOv10", value=True)
+    yolov11 = st.checkbox("YOLOv11", value=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Run detection button
@@ -147,20 +129,15 @@ if uploaded_files:
                     results[uploaded_file.name] = {}
                     
                     for model_version in selected_models:
-                        try:
-                            # Update status
-                            status_text.text(f"Currently processing: {uploaded_file.name} with YOLO{model_version}")
-                            
-                            # Process the image
-                            model = get_model(model_version)
-                            result_image = process_image(image, model)
-                            
-                            # Store the result
-                            results[uploaded_file.name][model_version] = result_image
-                        except Exception as e:
-                            st.error(f"Error processing {uploaded_file.name} with YOLO{model_version}: {str(e)}")
-                            # Store original image as fallback
-                            results[uploaded_file.name][model_version] = image
+                        # Update status
+                        status_text.text(f"Currently processing: {uploaded_file.name} with YOLO{model_version}")
+                        
+                        # Process the image
+                        model = get_model(model_version)
+                        result_image = process_image(image, model)
+                        
+                        # Store the result
+                        results[uploaded_file.name][model_version] = result_image
                         
                         # Update progress
                         completed_operations += 1
@@ -188,27 +165,14 @@ if uploaded_files:
                         with result_cols[i]:
                             st.markdown(f"**YOLO{model_version}**")
                             
-                            try:
-                                # Check if result_image is a numpy array (from OpenCV)
-                                if isinstance(result_image, np.ndarray):
-                                    # Convert from BGR to RGB if it has 3 channels
-                                    if result_image.shape[2] == 3:
-                                        result_image = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
-                                    pil_image = Image.fromarray(result_image)
-                                elif not isinstance(result_image, Image.Image):
-                                    # Try to convert to PIL Image if it's not already
-                                    pil_image = Image.fromarray(np.array(result_image))
-                                else:
-                                    pil_image = result_image
-                                
-                                # Display the image using Streamlit's image function
-                                st.image(pil_image, caption=f"YOLO{model_version} Result", use_container_width=True)
-                                
-                                # Provide a download link for the image
-                                buffered = io.BytesIO()
-                                pil_image.save(buffered, format="JPEG")
-                                img_str = base64.b64encode(buffered.getvalue()).decode()
-                                href = f'<a href="data:file/jpg;base64,{img_str}" download="{image_name}_YOLO{model_version}.jpg">Download</a>'
-                                st.markdown(href, unsafe_allow_html=True)
-                            except Exception as e:
-                                st.error(f"Error displaying result for {image_name} with YOLO{model_version}: {str(e)}")
+                            # Convert PIL image to bytes for display
+                            buffered = io.BytesIO()
+                            result_image.save(buffered, format="JPEG")
+                            img_str = base64.b64encode(buffered.getvalue()).decode()
+                            
+                            # Display the image using Streamlit's image function
+                            st.image(result_image, caption=f"YOLO{model_version} Result", use_container_width=True)
+                            
+                            # Provide a download link for the image
+                            href = f'<a href="data:file/jpg;base64,{img_str}" download="{image_name}_YOLO{model_version}.jpg">Download</a>'
+                            st.markdown(href, unsafe_allow_html=True)

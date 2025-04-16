@@ -1,15 +1,20 @@
 import streamlit as st
 import os
 import time
+
+# Add cv2 import before using it
+try:
+    import cv2
+    st.write(f"Python version: {sys.version}")
+    st.write(f"OpenCV version: {cv2.__version__}")
+except ImportError:
+    st.error("OpenCV (cv2) is not installed or cannot be imported")
+    st.write(f"Python version: {sys.version}")
+    
 from PIL import Image
 import io
 import base64
 from utils.detection import process_image, get_model
-
-# Then add this debug information section
-import sys
-st.write(f"Python version: {sys.version}")
-st.write(f"OpenCV version: {cv2.__version__}")
 
 # Set page config
 st.set_page_config(

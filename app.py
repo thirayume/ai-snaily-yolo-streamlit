@@ -6,6 +6,11 @@ import io
 import base64
 from utils.detection import process_image, get_model
 
+# Then add this debug information section
+import sys
+st.write(f"Python version: {sys.version}")
+st.write(f"OpenCV version: {cv2.__version__}")
+
 # Set page config
 st.set_page_config(
     page_title="AI Snaily - YOLO Detection",

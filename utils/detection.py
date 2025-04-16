@@ -14,6 +14,27 @@ import pathlib
 model_cache = {}
 
 def get_model(version):
+    try:
+        if version == "v5":
+            import torch
+            model = torch.hub.load('ultralytics/yolov5', 'yolov5s', trust_repo=True)
+            return model
+        elif version == "v8":
+            try:
+                from ultralytics import YOLO
+                return YOLO('yolov8s.pt')
+            except Exception as e:
+                st.warning(f"Could not load YOLOv8: {str(e)}")
+                # Fallback to YOLOv5
+                import torch
+                return torch.hub.load('ultralytics/yolov5', 'yolov5s', trust_repo=True)
+        else:
+            st.warning(f"Unsupported model version: {version}, using YOLOv5")
+            import torch
+            return torch.hub.load('ultralytics/yolov5', 'yolov5s', trust_repo=True)
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        raise
     """
     Load and cache YOLO model by version
     """
@@ -445,6 +466,37 @@ def get_model(version):
     return model
 
 def process_image(image, model):
+    try:
+        # Convert PIL Image to numpy array if it's a PIL Image
+        if hasattr(image, 'convert'):
+            img_array = np.array(image)
+        else:
+            img_array = image
+            
+        # Run detection
+        results = model(img_array)
+        
+        # Get the result image with annotations
+        if hasattr(results, 'render'):  # YOLOv8 style
+            return results.render()[0]  # Return the first rendered image
+        elif hasattr(results, 'ims'):   # YOLOv5 style
+            return Image.fromarray(results.ims[0])
+        elif hasattr(results, 'imgs'):  # Older YOLOv5 style
+            return Image.fromarray(results.imgs[0])
+        else:
+            # Try to get pandas DataFrame results and draw boxes manually
+            result_df = results.pandas().xyxy[0]
+            img = img_array.copy()
+            for _, row in result_df.iterrows():
+                x1, y1, x2, y2 = int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax'])
+                label = f"{row['name']} {row['confidence']:.2f}"
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            return img
+    except Exception as e:
+        st.error(f"Error processing image: {str(e)}")
+        # Return the original image if processing fails
+        return image
     """
     Process an image with the given YOLO model
     

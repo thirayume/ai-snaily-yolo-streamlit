@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 
 2. Place your YOLO model files in the `models` directory:
-   - v5.pt (download from [Ultralytics YOLOv5](https://github.com/ultralytics/yolov5/releases))
+   - v5.pt (download from [Ultralytics YOLOv5](https://github.com/ultralytics/yolov5))
    - v8.pt (download from [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics))
-   - v10.pt (download from appropriate source)
-   - v11.pt (download from appropriate source)
+   - v10.pt (download from [THU-MIG YOLOv10](https://github.com/THU-MIG/yolov10))
+   - v11.pt (download from [Ultralytics YOLOv11](https://github.com/ultralytics/ultralytics))

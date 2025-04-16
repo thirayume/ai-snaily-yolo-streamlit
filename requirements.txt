@@ -4,8 +4,5 @@ torch==2.1.0
 torchvision==0.16.0
 Pillow==10.0.1
 numpy==1.24.3
-# Replace the headless version with the regular one
-opencv-python==4.8.1.78
-# Remove the headless version
-# opencv-python-headless==4.8.1.78
+opencv-python-headless==4.8.1.78
 yolov5==7.0.13

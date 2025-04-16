@@ -1,18 +1,11 @@
 [build]
   command = "pip install -r requirements.txt"
-  publish = "."
+  publish = "public"
 
-[build.environment]
-  PYTHON_VERSION = "3.11"
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/streamlit"
   status = 200
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-
-[functions.streamlit]
-  external_node_modules = ["@streamlit/sdk"]

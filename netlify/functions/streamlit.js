@@ -2,24 +2,24 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 exports.handler = async function(event, context) {
-  // Path to your Streamlit app
-  const appPath = path.join(__dirname, '../../app.py');
+  // Start Streamlit process
+  const streamlitProcess = spawn('streamlit', ['run', 'app.py']);
   
-  // Run Streamlit
-  const streamlit = spawn('streamlit', ['run', appPath]);
-  
-  // Log output
-  streamlit.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
+  // Collect any output from Streamlit
+  let output = '';
+  streamlitProcess.stdout.on('data', (data) => {
+    output += data.toString();
   });
   
-  streamlit.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
+  // Handle Streamlit process completion
+  await new Promise((resolve) => {
+    streamlitProcess.on('close', (code) => {
+      resolve();
+    });
   });
   
-  // Return response
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Streamlit app is running" }),
+    body: output || "Streamlit app started"
   };
 };

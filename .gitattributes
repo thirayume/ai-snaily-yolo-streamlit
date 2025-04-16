@@ -1,7 +1,12 @@
-# Auto detect text files and perform LF normalization
+\# filter=lfs diff=lfs merge=lfs -text
 * text=auto
 yolo_versions/*.weights filter=lfs diff=lfs merge=lfs -text
 yolo_versions/*.pt filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
 yolo_versions/*.h5 filter=lfs diff=lfs merge=lfs -text
 yolo_versions/*.onnx filter=lfs diff=lfs merge=lfs -text
+files filter=lfs diff=lfs merge=lfs -text
+Track filter=lfs diff=lfs merge=lfs -text
+all filter=lfs diff=lfs merge=lfs -text
+PyTorch filter=lfs diff=lfs merge=lfs -text
+model filter=lfs diff=lfs merge=lfs -text
